@@ -20,6 +20,7 @@ import {
   Terminal,
   User,
 } from "lucide-react"
+import { BlogSection } from "@/components/blog-section"
 
 export default function Home() {
   return (
@@ -43,6 +44,9 @@ export default function Home() {
             </Link>
             <Link href="#skills" className="hover:text-emerald-400 transition-colors">
               Skills
+            </Link>
+            <Link href="#blog" className="hover:text-emerald-400 transition-colors">
+              Blog
             </Link>
             <Link href="#contact" className="hover:text-emerald-400 transition-colors">
               Contact
@@ -506,6 +510,9 @@ export default function Home() {
             </Card>
           </div>
         </section>
+
+        {/* Blog Section */}
+        <BlogSection />
 
         {/* Contact Section */}
         <section id="contact" className="py-16">

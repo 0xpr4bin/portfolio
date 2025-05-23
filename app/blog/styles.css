@@ -1,0 +1,25 @@
+/* Blog post styles */
+.blog-post-content img {
+  display: block;
+  margin: 2rem auto;
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.blog-post-content pre {
+  background-color: #1f2937;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.blog-post-content code {
+  background-color: #1f2937;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  color: #10b981;
+  font-family: monospace;
+}

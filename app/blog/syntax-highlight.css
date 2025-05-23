@@ -1,0 +1,46 @@
+/* Basic syntax highlighting styles */
+.syntax-highlight {
+  background-color: #1e293b;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.syntax-string {
+  color: #a5d6ff;
+}
+
+.syntax-keyword {
+  color: #ff7b72;
+}
+
+.syntax-comment {
+  color: #8b949e;
+  font-style: italic;
+}
+
+.syntax-number {
+  color: #79c0ff;
+}
+
+/* Additional styles for inline code */
+code:not(pre code) {
+  background-color: #1e293b;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  color: #10b981;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+/* Styles for code blocks */
+pre {
+  background-color: #1e293b;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
