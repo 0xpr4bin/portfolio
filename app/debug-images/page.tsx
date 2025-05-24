@@ -1,3 +1,7 @@
+"use client"
+
+import type React from "react"
+
 export default function DebugImagesPage() {
   const imageList = [
     "/blog-images/vulnet-enum.jpg",
@@ -10,6 +14,19 @@ export default function DebugImagesPage() {
     "/blog-images/vulnet-shell.jpg",
     "/blog-images/vulnet-bloodhound.jpg",
   ]
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement
+    target.style.display = "none"
+    const errorDiv = target.nextElementSibling as HTMLElement
+    if (errorDiv) errorDiv.style.display = "block"
+  }
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const target = e.target as HTMLImageElement
+    const errorDiv = target.nextElementSibling as HTMLElement
+    if (errorDiv) errorDiv.style.display = "none"
+  }
 
   return (
     <div className="container mx-auto p-8 bg-gray-900 text-white min-h-screen">
@@ -25,17 +42,8 @@ export default function DebugImagesPage() {
                 src={imagePath || "/placeholder.svg"}
                 alt={`Test image ${index + 1}`}
                 className="w-full h-32 object-cover rounded"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement
-                  target.style.display = "none"
-                  const errorDiv = target.nextElementSibling as HTMLElement
-                  if (errorDiv) errorDiv.style.display = "block"
-                }}
-                onLoad={(e) => {
-                  const target = e.target as HTMLImageElement
-                  const errorDiv = target.nextElementSibling as HTMLElement
-                  if (errorDiv) errorDiv.style.display = "none"
-                }}
+                onError={handleImageError}
+                onLoad={handleImageLoad}
               />
               <div
                 className="w-full h-32 bg-red-900 border border-red-700 rounded flex items-center justify-center text-red-300 text-sm"

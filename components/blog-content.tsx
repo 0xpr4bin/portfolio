@@ -12,11 +12,12 @@ export function BlogContent({ content }: BlogContentProps) {
   useEffect(() => {
     if (!contentRef.current) return
 
-    // Find all images and add click event listeners
+    // Find all images and add click event listeners for lightbox
     const images = contentRef.current.querySelectorAll("img")
     images.forEach((img) => {
       img.classList.add("cursor-pointer", "transition-transform", "hover:scale-105")
-      img.addEventListener("click", () => {
+
+      const handleClick = () => {
         const src = img.getAttribute("src")
         const alt = img.getAttribute("alt") || "Image"
 
@@ -52,22 +53,28 @@ export function BlogContent({ content }: BlogContentProps) {
         lightbox.appendChild(imgContainer)
         document.body.appendChild(lightbox)
 
-        // Close on click outside or close button
-        lightbox.addEventListener("click", (e) => {
+        // Close handlers
+        const closeHandler = (e: Event) => {
           if (e.target === lightbox || e.target === closeBtn) {
             document.body.removeChild(lightbox)
+            document.removeEventListener("keydown", keyHandler)
           }
-        })
+        }
 
-        // Close on escape key
-        document.addEventListener("keydown", (e) => {
+        const keyHandler = (e: KeyboardEvent) => {
           if (e.key === "Escape" && document.body.contains(lightbox)) {
             document.body.removeChild(lightbox)
+            document.removeEventListener("keydown", keyHandler)
           }
-        })
-      })
+        }
+
+        lightbox.addEventListener("click", closeHandler)
+        document.addEventListener("keydown", keyHandler)
+      }
+
+      img.addEventListener("click", handleClick)
     })
-  }, [])
+  }, [content])
 
   return (
     <div

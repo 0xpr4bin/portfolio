@@ -62,7 +62,7 @@ export function BlogImage({ src, alt, width = 800, height = 400, className = "" 
         </div>
       )}
       <img
-        src={src || createPlaceholder(alt)}
+        src={src || "/placeholder.svg"}
         alt={alt}
         onError={handleImageError}
         onLoad={handleImageLoad}
