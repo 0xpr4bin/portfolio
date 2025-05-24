@@ -45,19 +45,33 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound()
   }
 
-  // Function to convert markdown to HTML with a more direct approach for images
+  // Function to create a placeholder image
+  const createPlaceholder = (text: string, width = 800, height = 400) => {
+    const svgContent = `
+      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+        <rect width="100%" height="100%" fill="#1f2937"/>
+        <rect x="10" y="10" width="${width - 20}" height="${height - 20}" fill="none" stroke="#374151" strokeWidth="2" strokeDasharray="5,5"/>
+        <text x="50%" y="45%" fontFamily="Arial, sans-serif" fontSize="16" fill="#9ca3af" textAnchor="middle" dy=".3em">
+          ${text}
+        </text>
+        <text x="50%" y="55%" fontFamily="Arial, sans-serif" fontSize="12" fill="#6b7280" textAnchor="middle" dy=".3em">
+          Security Analysis Screenshot
+        </text>
+      </svg>
+    `
+    return `data:image/svg+xml;base64,${btoa(svgContent)}`
+  }
+
+  // Function to convert markdown to HTML with better image handling
   const markdownToHtml = (markdown: string) => {
-    // Split the markdown into lines
     const lines = markdown.split("\n")
     let html = ""
 
-    // Process each line
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i]
 
       // Check if the line is an image
       if (line.trim().startsWith("![") && line.includes("](") && line.includes(")")) {
-        // Extract alt text and URL
         const altStart = line.indexOf("![") + 2
         const altEnd = line.indexOf("](")
         const urlStart = altEnd + 2
@@ -67,8 +81,28 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           const alt = line.substring(altStart, altEnd)
           const url = line.substring(urlStart, urlEnd)
 
-          // Create the image HTML
-          html += `<img src="${url}" alt="${alt}" class="my-6 rounded-lg max-w-full h-auto shadow-md mx-auto" loading="lazy" />\n`
+          // If it's a placeholder URL, use it directly
+          if (url.includes("/placeholder.svg")) {
+            html += `<div class="my-6">
+              <img 
+                src="${url}" 
+                alt="${alt}" 
+                class="rounded-lg max-w-full h-auto shadow-md mx-auto cursor-pointer transition-transform hover:scale-105" 
+                loading="lazy"
+              />
+            </div>\n`
+          } else {
+            // For other images, create a fallback placeholder
+            const placeholderUrl = createPlaceholder(alt)
+            html += `<div class="my-6">
+              <img 
+                src="${placeholderUrl}" 
+                alt="${alt}" 
+                class="rounded-lg max-w-full h-auto shadow-md mx-auto cursor-pointer transition-transform hover:scale-105" 
+                loading="lazy"
+              />
+            </div>\n`
+          }
           continue
         }
       }
@@ -91,7 +125,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         continue
       }
 
-      // Bold and italic (process these after we've handled special lines)
+      // Bold and italic
       line = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       line = line.replace(/\*(.*?)\*/g, "<em>$1</em>")
 
@@ -103,17 +137,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
       // Code blocks
       if (line.trim() === "```" || line.trim().startsWith("```")) {
-        // Start of code block
         if (!line.trim().startsWith("```") || line.trim() === "```") {
-          // Simple code block without language
           html += '<pre class="syntax-highlight"><code>\n'
         } else {
-          // Code block with language
           const lang = line.trim().substring(3).trim()
           html += `<pre class="syntax-highlight"><code class="language-${lang}">\n`
         }
 
-        // Collect all lines until the closing \`\`\`
         let codeContent = ""
         i++
         while (i < lines.length && !lines[i].trim().startsWith("```")) {
@@ -138,7 +168,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         continue
       }
 
-      // Paragraphs (only if the line is not empty and not already a special element)
+      // Paragraphs
       if (line.trim() !== "" && !line.startsWith("<")) {
         html += `<p class="mb-4">${line}</p>\n`
       } else if (line.trim() === "") {
@@ -228,7 +258,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       </footer>
 
-      {/* Add the syntax highlighter component */}
       <SyntaxHighlighter />
     </div>
   )
