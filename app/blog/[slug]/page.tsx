@@ -45,24 +45,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound()
   }
 
-  // Function to create a placeholder image
-  const createPlaceholder = (text: string, width = 800, height = 400) => {
-    const svgContent = `
-      <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-        <rect width="100%" height="100%" fill="#1f2937"/>
-        <rect x="10" y="10" width="${width - 20}" height="${height - 20}" fill="none" stroke="#374151" strokeWidth="2" strokeDasharray="5,5"/>
-        <text x="50%" y="45%" fontFamily="Arial, sans-serif" fontSize="16" fill="#9ca3af" textAnchor="middle" dy=".3em">
-          ${text}
-        </text>
-        <text x="50%" y="55%" fontFamily="Arial, sans-serif" fontSize="12" fill="#6b7280" textAnchor="middle" dy=".3em">
-          Security Analysis Screenshot
-        </text>
-      </svg>
-    `
-    return `data:image/svg+xml;base64,${btoa(svgContent)}`
-  }
-
-  // Function to convert markdown to HTML with better image handling
+  // Function to convert markdown to HTML - simplified to use actual image paths
   const markdownToHtml = (markdown: string) => {
     const lines = markdown.split("\n")
     let html = ""
@@ -81,28 +64,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           const alt = line.substring(altStart, altEnd)
           const url = line.substring(urlStart, urlEnd)
 
-          // If it's a placeholder URL, use it directly
-          if (url.includes("/placeholder.svg")) {
-            html += `<div class="my-6">
-              <img 
-                src="${url}" 
-                alt="${alt}" 
-                class="rounded-lg max-w-full h-auto shadow-md mx-auto cursor-pointer transition-transform hover:scale-105" 
-                loading="lazy"
-              />
-            </div>\n`
-          } else {
-            // For other images, create a fallback placeholder
-            const placeholderUrl = createPlaceholder(alt)
-            html += `<div class="my-6">
-              <img 
-                src="${placeholderUrl}" 
-                alt="${alt}" 
-                class="rounded-lg max-w-full h-auto shadow-md mx-auto cursor-pointer transition-transform hover:scale-105" 
-                loading="lazy"
-              />
-            </div>\n`
-          }
+          // Use the image path directly without any fallback processing
+          html += `<div class="my-6">
+            <img 
+              src="${url}" 
+              alt="${alt}" 
+              class="rounded-lg max-w-full h-auto shadow-md mx-auto cursor-pointer transition-transform hover:scale-105" 
+              loading="lazy"
+            />
+          </div>\n`
           continue
         }
       }
@@ -228,6 +198,27 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
 
           <BlogContent content={markdownToHtml(post.content)} />
+
+          {/* Debug info for images */}
+          <div className="mt-8 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+            <h3 className="text-lg font-semibold mb-2 text-yellow-400">Image Debug Info</h3>
+            <p className="text-sm text-gray-300 mb-2">
+              If you're seeing placeholder images instead of real screenshots:
+            </p>
+            <div className="space-y-1 text-sm text-gray-400">
+              <p>
+                1. Visit{" "}
+                <a href="/test-images-direct" className="text-blue-400 hover:underline">
+                  /test-images-direct
+                </a>{" "}
+                to test image accessibility
+              </p>
+              <p>
+                2. Ensure images are in <code className="bg-gray-700 px-1 rounded">public/blog-images/</code>
+              </p>
+              <p>3. Check that file names match exactly (case-sensitive)</p>
+            </div>
+          </div>
 
           <div className="mt-12 pt-8 border-t border-gray-800">
             <h3 className="text-2xl font-bold mb-4">Share this article</h3>
