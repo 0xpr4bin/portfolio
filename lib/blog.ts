@@ -128,7 +128,7 @@ Add this line to the bottom of the script and wait for netcat to catch the shell
 
 \`nc -lvnp 4444\`
 
-![Reverse Shell](/placeholder.svg?height=400&width=800&text=Reverse+Shell+Connection)
+![Reverse Shell Connection](/images/shell.jpg)
 
 Finally, we got reverse shell as enterprise security for the windows server.
 
