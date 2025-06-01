@@ -101,15 +101,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           html += "</code></pre>\n"
           inCodeBlock = false
         } else {
-          html +=
-            '<pre class="bg-gray-800 rounded-lg p-3 my-4 overflow-x-auto"><code class="text-gray-100 font-mono text-sm">'
+          // Simple code block without any syntax highlighting classes
+          html += '<pre class="bg-gray-800 rounded-lg p-3 my-4 overflow-x-auto"><code>'
           inCodeBlock = true
         }
         continue
       }
 
       if (inCodeBlock) {
-        // Inside code block - escape HTML and preserve formatting
+        // Inside code block - escape HTML and preserve formatting without any syntax highlighting
         const escapedLine = line
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
