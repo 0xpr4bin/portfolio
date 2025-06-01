@@ -6,7 +6,6 @@ import { Calendar, ChevronLeft, Clock, Share2 } from "lucide-react"
 import { getBlogPostBySlug, getBlogPosts } from "@/lib/blog"
 import type { Metadata } from "next"
 import { BlogContent } from "@/components/blog-content"
-import { SyntaxHighlighter } from "@/components/syntax-highlighter"
 import "../syntax-highlight.css"
 
 interface BlogPostPageProps {
@@ -236,8 +235,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
         </div>
       </footer>
-
-      <SyntaxHighlighter />
     </div>
   )
 }

