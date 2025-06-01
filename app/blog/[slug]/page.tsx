@@ -99,9 +99,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       line = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       line = line.replace(/\*(.*?)\*/g, "<em>$1</em>")
 
-      // Links
+      // Links - fix the regex pattern
       line = line.replace(
-        /\[(.*?)\]$$(.*?)$$/g,
+        /\[([^\]]+)\]$$([^)]+)$$/g,
         '<a href="$2" class="text-emerald-400 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>',
       )
 
