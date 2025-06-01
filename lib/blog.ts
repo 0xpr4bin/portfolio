@@ -56,8 +56,6 @@ A Golden Ticket attack is a type of attack in which an attacker gains access to 
       excerpt:
         "A walkthrough of the Vulnet Active room on TryHackMe, focusing on Active Directory exploitation techniques.",
       content: `
-# Vulnet Active TryHackMe
-
 **Enumeration**
 
 This room on tryhackme is all about active directory and domain controller. So let's begin our machine with Nmap scanning.
