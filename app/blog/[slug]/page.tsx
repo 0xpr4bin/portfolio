@@ -119,6 +119,15 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         continue
       }
 
+      // Check for section headers (bold text that represents major sections)
+      if (line.match(/^\*\*([^*]+)\*\*$/)) {
+        const sectionTitle = line.replace(/^\*\*/, "").replace(/\*\*$/, "")
+        html += `<div class="bg-gray-800/50 border-l-4 border-emerald-500 px-3 py-1 my-4 rounded-r-lg">
+          <h3 class="text-xl font-bold text-emerald-400 mb-0">${sectionTitle}</h3>
+        </div>\n`
+        continue
+      }
+
       // Only apply inline formatting if NOT in code block
       // Inline code
       line = line.replace(
