@@ -45,10 +45,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     notFound()
   }
 
-  // Function to convert markdown to HTML - simplified to use actual image paths
+  // Function to convert markdown to HTML - simplified without syntax highlighting
   const markdownToHtml = (markdown: string) => {
     const lines = markdown.split("\n")
     let html = ""
+    let inCodeBlock = false
 
     for (let i = 0; i < lines.length; i++) {
       let line = lines[i]
@@ -64,15 +65,14 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           const alt = line.substring(altStart, altEnd)
           const url = line.substring(urlStart, urlEnd)
 
-          // Use the image path directly without any fallback processing
           html += `<div class="my-6">
-            <img 
-              src="${url}" 
-              alt="${alt}" 
-              class="rounded-lg max-w-full h-auto shadow-md mx-auto cursor-pointer transition-transform hover:scale-105" 
-              loading="lazy"
-            />
-          </div>\n`
+          <img 
+            src="${url}" 
+            alt="${alt}" 
+            class="rounded-lg max-w-full h-auto shadow-md mx-auto cursor-pointer transition-transform hover:scale-105" 
+            loading="lazy"
+          />
+        </div>\n`
           continue
         }
       }
@@ -95,38 +95,47 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         continue
       }
 
+      // Code blocks
+      if (line.trim() === "```" || line.trim().startsWith("```")) {
+        if (inCodeBlock) {
+          html += "</code></pre>\n"
+          inCodeBlock = false
+        } else {
+          html +=
+            '<pre class="bg-gray-800 rounded-lg p-3 my-4 overflow-x-auto"><code class="text-gray-100 font-mono text-sm">'
+          inCodeBlock = true
+        }
+        continue
+      }
+
+      if (inCodeBlock) {
+        // Inside code block - escape HTML and preserve formatting
+        const escapedLine = line
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;")
+        html += escapedLine + "\n"
+        continue
+      }
+
+      // Only apply inline formatting if NOT in code block
+      // Inline code
+      line = line.replace(
+        /`([^`]+)`/g,
+        '<code class="bg-gray-800 px-2 py-1 rounded text-emerald-300 font-mono text-sm">$1</code>',
+      )
+
       // Bold and italic
       line = line.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
       line = line.replace(/\*(.*?)\*/g, "<em>$1</em>")
 
-      // Links - fix the regex pattern
+      // Links
       line = line.replace(
         /\[([^\]]+)\]$$([^)]+)$$/g,
         '<a href="$2" class="text-emerald-400 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>',
       )
-
-      // Code blocks
-      if (line.trim() === "```" || line.trim().startsWith("```")) {
-        if (!line.trim().startsWith("```") || line.trim() === "```") {
-          html += '<pre class="syntax-highlight"><code>\n'
-        } else {
-          const lang = line.trim().substring(3).trim()
-          html += `<pre class="syntax-highlight"><code class="language-${lang}">\n`
-        }
-
-        let codeContent = ""
-        i++
-        while (i < lines.length && !lines[i].trim().startsWith("```")) {
-          codeContent += lines[i] + "\n"
-          i++
-        }
-
-        html += codeContent + "</code></pre>\n"
-        continue
-      }
-
-      // Inline code
-      line = line.replace(/`(.*?)`/g, '<code class="bg-gray-800 px-1 py-0.5 rounded text-emerald-300">$1</code>')
 
       // Lists
       if (line.match(/^\d+\. /)) {
@@ -198,27 +207,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
 
           <BlogContent content={markdownToHtml(post.content)} />
-
-          {/* Debug info for images */}
-          <div className="mt-8 p-4 bg-gray-800/50 border border-gray-700 rounded-lg">
-            <h3 className="text-lg font-semibold mb-2 text-yellow-400">Image Debug Info</h3>
-            <p className="text-sm text-gray-300 mb-2">
-              If you're seeing placeholder images instead of real screenshots:
-            </p>
-            <div className="space-y-1 text-sm text-gray-400">
-              <p>
-                1. Visit{" "}
-                <a href="/test-images-direct" className="text-blue-400 hover:underline">
-                  /test-images-direct
-                </a>{" "}
-                to test image accessibility
-              </p>
-              <p>
-                2. Ensure images are in <code className="bg-gray-700 px-1 rounded">public/blog-images/</code>
-              </p>
-              <p>3. Check that file names match exactly (case-sensitive)</p>
-            </div>
-          </div>
 
           <div className="mt-12 pt-8 border-t border-gray-800">
             <h3 className="text-2xl font-bold mb-4">Share this article</h3>

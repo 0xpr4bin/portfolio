@@ -2,12 +2,12 @@
 .syntax-highlight {
   background-color: #1e293b;
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 0.75rem; /* Reduced from 1rem */
   overflow-x: auto;
-  margin: 1.5rem 0;
+  margin: 1rem 0; /* Reduced from 1.5rem */
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.9rem;
-  line-height: 1.5;
+  line-height: 1.4; /* Reduced from 1.5 */
 }
 
 .syntax-string {
@@ -40,7 +40,7 @@ code:not(pre code) {
 pre {
   background-color: #1e293b;
   border-radius: 0.5rem;
-  padding: 1rem;
+  padding: 0.75rem; /* Reduced from 1rem */
   overflow-x: auto;
-  margin: 1.5rem 0;
+  margin: 1rem 0; /* Reduced from 1.5rem */
 }
