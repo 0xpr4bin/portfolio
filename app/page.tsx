@@ -67,8 +67,8 @@ export default function Home() {
 
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <section id="about" className="py-20 flex flex-col md:flex-row items-center gap-8">
-          <div className="w-full md:w-1/2 space-y-6">
+        <section id="about" className="py-20">
+          <div className="w-full space-y-6">
             <div className="space-y-2">
               <h1 className="text-4xl md:text-5xl font-bold">
                 <span className="text-emerald-500">Senior Security Researcher</span>
@@ -123,15 +123,6 @@ export default function Home() {
               </Button>
             </div>
           </div>
-
-          <div className="w-full md:w-1/2 flex justify-center">
-            <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-emerald-500/30 bg-gray-800 flex items-center justify-center">
-              <Shield className="w-32 h-32 text-emerald-500/30" />
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/80 flex items-end justify-center pb-6">
-                <span className="text-xl font-bold text-emerald-400">Prabin Sigdel</span>
-              </div>
-            </div>
-          </div>
         </section>
 
         {/* Experience Section */}
@@ -154,7 +145,7 @@ export default function Home() {
                       <p className="text-emerald-400">CryptoGen Nepal</p>
                     </div>
                     <Badge variant="outline" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/50">
-                      06/2023 - Present
+                      06/2023 - 07/2025
                     </Badge>
                   </div>
                   <ul className="mt-4 space-y-2 text-gray-300">
@@ -385,10 +376,6 @@ export default function Home() {
                       <li className="flex items-center">
                         <span className="mr-2 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                         <span>CICD Security</span>
-                      </li>
-                      <li className="flex items-center">
-                        <span className="mr-2 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                        <span>Network Traffic Analysis</span>
                       </li>
                     </ul>
                   </CardContent>
